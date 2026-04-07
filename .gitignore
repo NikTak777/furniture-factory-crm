@@ -416,3 +416,23 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+
+## Базы данных SQLite (у тебя в списке есть furniture.db)
+*.db
+*.db-shm
+*.db-wal
+
+## Файлы настроек пользователя Visual Studio
+*.user
+*.userosscache
+*.suo
+.vs/
+.vscode/
+
+## Результаты компиляции (на всякий случай, если появятся)
+bin/
+obj/
+
+## Файлы публикации (Publish)
+PublishProfiles/
+*.pubxml
