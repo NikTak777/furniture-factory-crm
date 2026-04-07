@@ -1,0 +1,177 @@
+<UserControl x:Class="FurnitureCRMClient.Views.MaterialNeedsAnalysisUserControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:oxy="http://oxyplot.org/wpf"
+    xmlns:local="clr-namespace:FurnitureCRMClient.Views"
+    mc:Ignorable="d"
+    d:DesignHeight="450" d:DesignWidth="800">
+
+    <UserControl.Resources>
+        <local:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        <Style x:Key="HeaderTextStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="24"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="#333333"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="2*" MinHeight="350" MaxHeight="800"/>  <!-- Таблица потребности -->
+            <RowDefinition Height="Auto"/>                                 <!-- Сплиттер -->
+            <RowDefinition Height="3*" MinHeight="220"/>                  <!-- Диаграммы -->
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="Анализ потребности в материалах" Margin="0,0,0,10" Style="{StaticResource HeaderTextStyle}"/>
+
+        <!-- Фильтры -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,10" VerticalAlignment="Center">
+            <TextBlock Text="Период заказов: " VerticalAlignment="Center" Margin="0,0,5,0"/>
+            <TextBlock Text="с" VerticalAlignment="Center" Margin="0,0,5,0"/>
+            <DatePicker x:Name="FromDatePicker" Width="130" Height="23" Margin="0,0,10,0"/>
+            <TextBlock Text="по" VerticalAlignment="Center" Margin="0,0,5,0"/>
+            <DatePicker x:Name="ToDatePicker" Width="130" Height="23" Margin="0,0,10,0"/>
+            <Button Content="Обновить анализ" Click="RefreshAnalysis_Click" Padding="10,3" />
+        </StackPanel>
+
+        <!-- Таблица потребности -->
+        <DataGrid Grid.Row="2"
+                  x:Name="NeedsDataGrid"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="True"
+                  ItemsSource="{Binding MaterialNeeds}">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Артикул сырья" Binding="{Binding MaterialId}" Width="Auto"/>
+                <DataGridTextColumn Header="Наименование материала" Binding="{Binding MaterialName}" Width="2*"/>
+                <DataGridTextColumn Header="Ед. изм." Binding="{Binding Unit}" Width="Auto"/>
+                <DataGridTextColumn Header="В наличии" Binding="{Binding QuantityAvailable}" Width="Auto"/>
+                <DataGridTextColumn Header="Требуется" Binding="{Binding RequiredQuantity}" Width="Auto"/>
+                <DataGridTextColumn Header="Остаток" Binding="{Binding Deficit}" Width="Auto"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- Перетаскиваемая граница между таблицей и диаграммами -->
+        <GridSplitter Grid.Row="3"
+                      Height="5"
+                      HorizontalAlignment="Stretch"
+                      VerticalAlignment="Center"
+                      Background="#FFE0E0E0"
+                      ResizeDirection="Rows"
+                      ResizeBehavior="PreviousAndNext"
+                      ShowsPreview="True"/>
+
+        <!-- Диаграммы: слева текущая потребность, справа топ-10 за всё время -->
+        <Grid Grid.Row="4" Margin="0,10,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Структура текущей потребности -->
+            <Grid Grid.Column="0" HorizontalAlignment="Left" x:Name="NeedsChartGrid">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0"
+                           Text="Структура потребности по материалам" 
+                           FontSize="14" 
+                           FontWeight="Bold" 
+                           Margin="0,0,0,5"
+                           Visibility="{Binding HasData, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <oxy:PlotView x:Name="NeedsPiePlot"
+                                  Grid.Column="0"
+                                  Margin="0,0,10,0"
+                                  HorizontalAlignment="Left"
+                                  VerticalAlignment="Stretch"
+                                  MinHeight="150"
+                                  Width="{Binding ElementName=NeedsChartGrid, Path=ActualHeight}" />
+
+                    <ItemsControl x:Name="CustomLegend"
+                                  Grid.Column="1"
+                                  ItemsSource="{Binding LegendItems}"
+                                  VerticalAlignment="Top"
+                                  Margin="0,25,0,0">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" Margin="0,2">
+                                    <Rectangle Width="16"
+                                               Height="16"
+                                               Fill="{Binding Color}"
+                                               Stroke="Black"
+                                               StrokeThickness="0.5"
+                                               Margin="0,0,5,0"/>
+                                    <TextBlock Text="{Binding Label}" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Grid>
+            </Grid>
+
+            <!-- Топ-10 материалов по потреблению за всё время -->
+            <Grid Grid.Column="1" Margin="20,0,0,0" HorizontalAlignment="Left" x:Name="TopMaterialsChartGrid">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0"
+                           Text="Топ-10 материалов по потреблению" 
+                           FontSize="14" 
+                           FontWeight="Bold" 
+                           Margin="0,0,0,5"
+                           Visibility="{Binding HasData, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <oxy:PlotView x:Name="TopMaterialsPiePlot"
+                                  Grid.Column="0"
+                                  Margin="0,0,10,0"
+                                  HorizontalAlignment="Left"
+                                  VerticalAlignment="Stretch"
+                                  MinHeight="150"
+                                  Width="{Binding ElementName=TopMaterialsChartGrid, Path=ActualHeight}" />
+
+                    <ItemsControl x:Name="TopMaterialsLegend"
+                                  Grid.Column="1"
+                                  ItemsSource="{Binding TopLegendItems}"
+                                  VerticalAlignment="Top"
+                                  Margin="0,25,0,0">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" Margin="0,2">
+                                    <Rectangle Width="16"
+                                               Height="16"
+                                               Fill="{Binding Color}"
+                                               Stroke="Black"
+                                               StrokeThickness="0.5"
+                                               Margin="0,0,5,0"/>
+                                    <TextBlock Text="{Binding Label}" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Grid>
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>
+
+

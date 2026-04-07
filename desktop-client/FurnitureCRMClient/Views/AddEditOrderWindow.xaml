@@ -1,0 +1,128 @@
+<Window x:Class="FurnitureCRMClient.Views.AddEditOrderWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:viewmodels="clr-namespace:FurnitureCRMClient.ViewModels"
+        xmlns:local="clr-namespace:FurnitureCRMClient.Views" 
+        mc:Ignorable="d"
+        Title="Добавить/Редактировать Заказ" Height="380" Width="450"
+        WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <local:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
+        <local:EditModeVisibilityConverter x:Key="EditModeVisibilityConverter"/>
+        <Style x:Key="HeaderTextStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="#333333"/>
+        </Style>
+        <!-- Стиль для ComboBox без красной обводки при ошибках -->
+        <Style TargetType="ComboBox">
+            <Setter Property="Validation.ErrorTemplate">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <AdornedElementPlaceholder/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Заголовок -->
+        <TextBlock Text="Данные Заказа" Grid.Row="0" Grid.ColumnSpan="2" Style="{StaticResource HeaderTextStyle}" Margin="0,0,0,15"/>
+
+        <!-- Продукт (Номенклатура) -->
+        <TextBlock Text="Номенклатура:" Grid.Row="1" Grid.Column="0" Margin="0,0,10,5"/>
+        <Grid Grid.Row="1" Grid.Column="1" Margin="0,0,0,5">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <ComboBox Grid.Row="0" Height="23"
+                      ItemsSource="{Binding FilteredProducts}"
+                      DisplayMemberPath="Наименование"
+                      SelectedItem="{Binding SelectedProduct, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                      IsEditable="True" 
+                      StaysOpenOnEdit="True"
+                      Text="{Binding SearchProductText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      IsTextSearchEnabled="False"
+                      IsEnabled="{Binding IsProductEditable}"/>
+            <TextBlock Grid.Row="1" Text="{Binding Errors[SelectedProduct]}" Foreground="Red" FontSize="10" Margin="0,2,0,0"/>
+        </Grid>
+
+        <!-- Количество -->
+        <TextBlock Text="Количество:" Grid.Row="2" Grid.Column="0" Margin="0,0,10,5"/>
+        <Grid Grid.Row="2" Grid.Column="1" Margin="0,0,0,5">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <TextBox Grid.Row="0" Height="23"
+                     Text="{Binding QuantityText, UpdateSourceTrigger=PropertyChanged}"
+                     IsEnabled="{Binding IsQuantityEditable}"/>
+            <TextBlock Grid.Row="1" Text="{Binding Errors[Quantity]}" Foreground="Red" FontSize="10" Margin="0,2,0,0"/>
+        </Grid>
+
+        <!-- Клиент -->
+        <TextBlock Text="Клиент:" Grid.Row="3" Grid.Column="0" Margin="0,0,10,5"/>
+        <Grid Grid.Row="3" Grid.Column="1" Margin="0,0,0,5">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <ComboBox Grid.Row="0" Height="23"
+                      ItemsSource="{Binding FilteredClients}"
+                      DisplayMemberPath="FullName"
+                      SelectedItem="{Binding SelectedClient, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                      IsEditable="True" 
+                      StaysOpenOnEdit="True"
+                      Text="{Binding SearchClientText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      IsTextSearchEnabled="False"
+                      IsEnabled="{Binding IsClientEditable}"/>
+            <TextBlock Grid.Row="1" Text="{Binding Errors[SelectedClient]}" Foreground="Red" FontSize="10" Margin="0,2,0,0"/>
+        </Grid>
+
+        <!-- Итоговая стоимость -->
+        <TextBlock Text="Итоговая стоимость:" Grid.Row="4" Grid.Column="0" Margin="0,0,10,15" VerticalAlignment="Center"/>
+        <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding Order.TotalPrice}" Margin="0,0,0,15" VerticalAlignment="Center" FontWeight="Bold"/>
+
+        <!-- Статус заказа -->
+        <TextBlock Text="Статус заказа:" Grid.Row="5" Grid.Column="0" Margin="0,0,10,5"
+                   Visibility="{Binding Order.OrderId, Converter={StaticResource EditModeVisibilityConverter}}"/>
+        <Grid Grid.Row="5" Grid.Column="1" Margin="0,0,0,5"
+              Visibility="{Binding Order.OrderId, Converter={StaticResource EditModeVisibilityConverter}}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <ComboBox Grid.Row="0" Height="23" HorizontalAlignment="Left"
+                      ItemsSource="{Binding AvailableStatuses}"
+                      SelectedItem="{Binding SelectedStatus, Mode=TwoWay}"
+                      Width="200"
+                      IsEnabled="{Binding IsStatusEditable}"
+                      SelectionChanged="ComboBoxStatus_SelectionChanged"/>
+            <TextBlock Grid.Row="1" Text="{Binding Errors[SelectedStatus]}" Foreground="Red" FontSize="10" Margin="0,2,0,0"/>
+        </Grid>
+
+        <!-- Кнопки -->
+        <StackPanel Grid.Row="6" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="Сохранить" Width="100" Margin="0,0,10,0" Click="Save_Click" IsEnabled="{Binding CanSave}"/>
+            <Button Content="Отмена" Width="100" Click="Cancel_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

@@ -1,0 +1,25 @@
+﻿<Window x:Class="FurnitureCRMClient.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Клиенты мебельной фабрики"
+        Height="450" Width="800">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Button x:Name="LoadButton"
+                Content="Загрузить клиентов"
+                Width="200"
+                Height="35"
+                HorizontalAlignment="Left"
+                Click="LoadButton_Click"/>
+
+        <DataGrid x:Name="ClientsGrid"
+                  Grid.Row="1"
+                  AutoGenerateColumns="True"
+                  Margin="0,10,0,0"
+                  IsReadOnly="True"/>
+    </Grid>
+</Window>

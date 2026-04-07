@@ -1,0 +1,105 @@
+<UserControl x:Class="FurnitureCRMClient.Views.MaterialPurchaseOrderUserControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:FurnitureCRMClient.Views"
+             mc:Ignorable="d"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <Style x:Key="HeaderTextStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="24"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="#333333"/>
+        </Style>
+    </UserControl.Resources>
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <TextBlock Grid.Row="0" Text="Оформление закупки сырья" Margin="0,0,0,10" Style="{StaticResource HeaderTextStyle}"/>
+
+        <!-- Панель фильтров -->
+        <StackPanel Grid.Row="1" Orientation="Vertical" Margin="0,0,0,10">
+            <!-- Первая строка: Поставщик, Наименование, Статус -->
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                <TextBlock Text="Поставщик:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                <TextBox Width="200"
+                         Height="23"
+                         Text="{Binding SearchSupplier, UpdateSourceTrigger=PropertyChanged}"
+                         Margin="0,0,16,0"/>
+
+                <TextBlock Text="Наименование:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                <TextBox Width="220"
+                         Height="23"
+                         Text="{Binding SearchMaterialName, UpdateSourceTrigger=PropertyChanged}"
+                         Margin="0,0,16,0"/>
+
+                <TextBlock Text="Статус:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                <ComboBox Width="160"
+                          Height="23"
+                          ItemsSource="{Binding Statuses}"
+                          SelectedItem="{Binding SelectedStatusFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            </StackPanel>
+
+            <!-- Вторая строка: количество, даты и оформитель -->
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Количество от:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                <TextBox Width="80"
+                         Height="23"
+                         Text="{Binding MinQuantityText, UpdateSourceTrigger=PropertyChanged}"
+                         Margin="0,0,8,0"/>
+                <TextBlock Text="до:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                <TextBox Width="80"
+                         Height="23"
+                         Text="{Binding MaxQuantityText, UpdateSourceTrigger=PropertyChanged}"
+                         Margin="0,0,16,0"/>
+
+                <TextBlock Text="Дата заказа от:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                <DatePicker Width="130"
+                            Height="23"
+                            SelectedDate="{Binding OrderDateFrom, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            Margin="0,0,8,0"/>
+                <TextBlock Text="до:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                <DatePicker Width="130"
+                            Height="23"
+                            SelectedDate="{Binding OrderDateTo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            Margin="0,0,16,0"/>
+
+                <TextBlock Text="Оформил:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                <ComboBox Width="180"
+                          Height="23"
+                          ItemsSource="{Binding StaffFilters}"
+                          SelectedItem="{Binding SelectedStaffFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                          Margin="0,0,16,0"/>
+
+                <Button Content="Очистить фильтры"
+                        Width="140"
+                        Click="ClearMaterialOrderFilters_Click"/>
+            </StackPanel>
+        </StackPanel>
+
+        <!-- Таблица заказов сырья -->
+        <DataGrid Grid.Row="2" x:Name="PurchaseOrdersDataGrid" AutoGenerateColumns="False" IsReadOnly="True" Margin="0,0,0,10" ItemsSource="{Binding MaterialOrdersView}">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Номер заказа" Binding="{Binding Номер_заказа}" Width="*"/>
+                <DataGridTextColumn Header="Поставщик" Binding="{Binding Поставщик}" Width="2*"/>
+                <DataGridTextColumn Header="Наименование сырья" Binding="{Binding Наименование_сырья}" Width="2*"/>
+                <DataGridTextColumn Header="Количество" Binding="{Binding Количество}" Width="*"/>
+                <DataGridTextColumn Header="Дата заказа" Binding="{Binding Дата_заказа, StringFormat=dd.MM.yyyy}" Width="*"/>
+                <DataGridTextColumn Header="Оформил" Binding="{Binding ФИО_оформителя}" Width="2*"/>
+                <DataGridTextColumn Header="Статус" Binding="{Binding Статус}" Width="*"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- Кнопки действий -->
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="Добавить" Margin="0,0,10,0" Click="AddOrder_Click"/>
+            <Button Content="Редактировать" Click="EditOrder_Click"/>
+        </StackPanel>
+    </Grid>
+</UserControl> 

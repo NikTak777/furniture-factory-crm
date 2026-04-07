@@ -1,0 +1,59 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Page Update="Views\AddEditNomenclatureWindow.xaml">
+      <XamlRuntime>WPF</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\WarehouseWorkerWindow.xaml">
+      <XamlRuntime>WPF</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\MaterialStockManagementUserControl.xaml">
+      <XamlRuntime>WPF</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\FinishedProductManagementUserControl.xaml">
+      <XamlRuntime>WPF</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="Views\MaterialPurchaseOrderUserControl.xaml">
+      <XamlRuntime>WPF</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Views\AddEditNomenclatureWindow.xaml.cs">
+      <DependentUpon>AddEditNomenclatureWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="ViewModels\NomenclatureViewModel.cs" />
+    <Compile Update="Views\WarehouseWorkerWindow.xaml.cs">
+      <DependentUpon>WarehouseWorkerWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\MaterialStockManagementUserControl.xaml.cs">
+      <DependentUpon>MaterialStockManagementUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\FinishedProductManagementUserControl.xaml.cs">
+      <DependentUpon>FinishedProductManagementUserControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Update="Views\MaterialPurchaseOrderUserControl.xaml.cs">
+      <DependentUpon>MaterialPurchaseOrderUserControl.xaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageReference Include="OxyPlot.Wpf" Version="2.2.0" />
+  </ItemGroup>
+
+</Project>

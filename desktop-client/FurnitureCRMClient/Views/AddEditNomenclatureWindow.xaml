@@ -1,0 +1,170 @@
+<Window x:Class="FurnitureCRMClient.Views.AddEditNomenclatureWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:FurnitureCRMClient.Views"
+        mc:Ignorable="d"
+        Title="Добавить/Редактировать Номенклатуру" Height="525" Width="650"
+        WindowStartupLocation="CenterOwner">
+    <Window.Resources>
+        <local:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
+    </Window.Resources>
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Наименование -->
+        <Label Content="Наименование:" Grid.Row="0" Grid.Column="0" Margin="0,5"/>
+        <StackPanel Grid.Row="0" Grid.Column="1" Margin="0,5">
+            <TextBox Height="23"
+                     Text="{Binding Nomenclature.Наименование, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"/>
+            <TextBlock Text="{Binding Errors[Наименование]}" Foreground="Red" FontSize="10" Margin="0,2,0,0"/>
+        </StackPanel>
+
+        <!-- Категория (выпадающий список) -->
+        <Label Content="Категория:" Grid.Row="1" Grid.Column="0" Margin="0,5"/>
+        <StackPanel Grid.Row="1" Grid.Column="1" Margin="0,5">
+            <ComboBox ItemsSource="{Binding AllowedCategories}"
+                      SelectedItem="{Binding Nomenclature.Категория, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"
+                      IsEditable="False"
+                      Height="23"/>
+            <TextBlock Text="{Binding Errors[Категория]}" Foreground="Red" FontSize="10" Margin="0,2,0,0"/>
+        </StackPanel>
+
+        <!-- Цвет -->
+        <Label Content="Цвет:" Grid.Row="2" Grid.Column="0" Margin="0,5"/>
+        <StackPanel Grid.Row="2" Grid.Column="1" Margin="0,5">
+            <TextBox Height="23"
+                     Text="{Binding Nomenclature.Цвет, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"/>
+            <TextBlock Text="{Binding Errors[Цвет]}" Foreground="Red" FontSize="10" Margin="0,2,0,0"/>
+        </StackPanel>
+
+        <!-- Размеры -->
+        <Label Content="Размеры:" Grid.Row="3" Grid.Column="0" Margin="0,5"/>
+        <StackPanel Grid.Row="3" Grid.Column="1" Margin="0,5">
+            <TextBox Height="23"
+                     Text="{Binding Nomenclature.Размеры, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"/>
+            <TextBlock Text="{Binding Errors[Размеры]}" Foreground="Red" FontSize="10" Margin="0,2,0,0"/>
+        </StackPanel>
+
+        <!-- Стоимость -->
+        <Label Content="Стоимость:" Grid.Row="4" Grid.Column="0" Margin="0,5"/>
+        <StackPanel Grid.Row="4" Grid.Column="1" Margin="0,5">
+            <TextBox Height="23"
+                     Text="{Binding Nomenclature.Стоимость, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"/>
+            <TextBlock Text="{Binding Errors[Стоимость]}" Foreground="Red" FontSize="10" Margin="0,2,0,0"/>
+        </StackPanel>
+
+        <!-- Спецификация сырья -->
+        <Label Content="Спецификация:" Grid.Row="5" Grid.Column="0" Margin="0,5" VerticalAlignment="Top"/>
+        <StackPanel Grid.Row="5" Grid.Column="1" Margin="0,5">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Левая часть: поиск и список всех материалов -->
+                <StackPanel Grid.Column="0">
+                    <TextBox Height="23"
+                             Margin="0,0,0,5"
+                             Text="{Binding MaterialSearchText, UpdateSourceTrigger=PropertyChanged}"
+                             ToolTip="Поиск по названию сырья"/>
+
+                    <ListBox ItemsSource="{Binding FilteredMaterials}"
+                             SelectionMode="Multiple"
+                             Height="140"
+                             ScrollViewer.VerticalScrollBarVisibility="Auto">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <CheckBox Content="{Binding Material.Наименование_материала}"
+                                              IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                              VerticalAlignment="Center"
+                                              Margin="0,0,5,0"/>
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <TextBox Height="23"
+                                                 Width="50"
+                                                 Text="{Binding Quantity, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                                 IsEnabled="{Binding IsSelected}"/>
+                                        <TextBlock Text="{Binding Material.Единица_измерения}"
+                                                   Margin="4,0,0,0"
+                                                   VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </StackPanel>
+
+                <!-- Правая часть: выбранные материалы с количеством -->
+                <StackPanel Grid.Column="1" Margin="10,0,0,0">
+                    <TextBlock Text="Выбранные материалы:"
+                               Height="23"
+                               VerticalAlignment="Center"
+                               FontWeight="Bold"
+                               Margin="0,0,0,4"/>
+                    <ListBox x:Name="SelectedMaterialsListBox"
+                             ItemsSource="{Binding AvailableMaterials}"
+                             Height="140"
+                             ScrollViewer.VerticalScrollBarVisibility="Auto"
+                             SelectionChanged="SelectedMaterialsListBox_SelectionChanged">
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="Visibility" Value="Visible"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsSelected}" Value="False">
+                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding Material.Наименование_материала}"/>
+                                    <TextBlock Text=" — " Margin="4,0,0,0"/>
+                                    <TextBlock Text="{Binding Quantity}"/>
+                                    <TextBlock Text=" " />
+                                    <TextBlock Text="{Binding Material.Единица_измерения}"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </StackPanel>
+            </Grid>
+
+            <!-- Сообщение об ошибке выбора сырья сразу под блоком спецификации -->
+            <TextBlock Text="{Binding Errors[MaterialsSelected]}"
+                       Foreground="Red"
+                       FontSize="10"
+                       Margin="0,4,0,0"/>
+        </StackPanel>
+
+        <!-- Кнопки -->
+        <StackPanel Orientation="Horizontal"
+                    Grid.Row="6" Grid.Column="0" Grid.ColumnSpan="2"
+                    HorizontalAlignment="Right" Margin="0,10,0,0">
+            <Button Content="Сохранить"
+                    Command="{Binding SaveCommand}"
+                    IsEnabled="{Binding HasErrors, Converter={StaticResource InverseBooleanConverter}}"
+                    Width="80" Margin="0,0,10,0"/>
+            <Button Content="Отмена"
+                    Command="{Binding CancelCommand}" Width="80"/>
+        </StackPanel>
+    </Grid>
+</Window>

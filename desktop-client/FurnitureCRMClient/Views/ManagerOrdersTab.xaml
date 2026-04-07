@@ -1,0 +1,122 @@
+<UserControl x:Class="FurnitureCRMClient.Views.ManagerOrdersTab"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    mc:Ignorable="d"
+    d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <Style x:Key="HeaderTextStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="24"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="#333333"/>
+        </Style>
+    </UserControl.Resources>
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Grid.Row="0" Text="Учёт заказов" Margin="0,0,0,10" Style="{StaticResource HeaderTextStyle}"/>
+
+        <!-- Панель поиска и фильтрации -->
+        <StackPanel Grid.Row="1" Orientation="Vertical" Margin="0,0,0,10">
+            <!-- Первая строка: товар, количество, статус, сотрудник, клиент -->
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                <TextBlock Text="Товар:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                <TextBox Width="200"
+                         Height="23"
+                         Text="{Binding SearchProductName, UpdateSourceTrigger=PropertyChanged}"
+                         Margin="0,0,16,0"/>
+
+                <TextBlock Text="Количество:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                <TextBox Width="80"
+                         Height="23"
+                         Text="{Binding QuantityText, UpdateSourceTrigger=PropertyChanged}"
+                         Margin="0,0,16,0"/>
+
+                <TextBlock Text="Статус:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                <ComboBox Width="160"
+                          Height="23"
+                          ItemsSource="{Binding Statuses}"
+                          SelectedItem="{Binding SelectedStatusFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                          Margin="0,0,16,0"/>
+
+                <TextBlock Text="Сотрудник:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                <TextBox Width="220"
+                         Height="23"
+                         Text="{Binding SearchStaffName, UpdateSourceTrigger=PropertyChanged}"
+                         Margin="0,0,16,0"/>
+
+                <TextBlock Text="Клиент:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                <TextBox Width="220"
+                         Height="23"
+                         Text="{Binding SearchClientName, UpdateSourceTrigger=PropertyChanged}"/>
+            </StackPanel>
+
+            <!-- Вторая строка: диапазоны цены и дат + кнопка очистки -->
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Сумма от:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                <TextBox Width="90"
+                         Height="23"
+                         Text="{Binding MinTotalPriceText, UpdateSourceTrigger=PropertyChanged}"
+                         Margin="0,0,8,0"/>
+                <TextBlock Text="до:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                <TextBox Width="90"
+                         Height="23"
+                         Text="{Binding MaxTotalPriceText, UpdateSourceTrigger=PropertyChanged}"
+                         Margin="0,0,16,0"/>
+
+                <TextBlock Text="Оформлен от:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                <DatePicker Width="130"
+                            Height="23"
+                            SelectedDate="{Binding OrderDateFrom, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            Margin="0,0,8,0"/>
+                <TextBlock Text="до:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                <DatePicker Width="130"
+                            Height="23"
+                            SelectedDate="{Binding OrderDateTo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            Margin="0,0,16,0"/>
+
+                <TextBlock Text="Выполнен от:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                <DatePicker Width="130"
+                            Height="23"
+                            SelectedDate="{Binding CompletionDateFrom, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            Margin="0,0,8,0"/>
+                <TextBlock Text="до:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                <DatePicker Width="130"
+                            Height="23"
+                            SelectedDate="{Binding CompletionDateTo, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                            Margin="0,0,16,0"/>
+
+                <Button Content="Очистить фильтры"
+                        Width="150"
+                        Click="ClearOrderFilters_Click"/>
+            </StackPanel>
+        </StackPanel>
+
+        <!-- Таблица для отображения заказов -->
+        <DataGrid Grid.Row="2" x:Name="OrdersDataGrid" AutoGenerateColumns="False" IsReadOnly="True" Margin="0,0,0,10" ItemsSource="{Binding OrdersView}">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Номер заказа" Binding="{Binding OrderId}" Width="Auto"/>
+                <DataGridTextColumn Header="Наименование товара" Binding="{Binding ProductName}" Width="2*"/>
+                <DataGridTextColumn Header="Количество" Binding="{Binding Quantity}" Width="Auto"/>
+                <DataGridTextColumn Header="Дата оформления" Binding="{Binding OrderDate, StringFormat='{}{0:dd.MM.yyyy}'}" Width="Auto"/>
+                <DataGridTextColumn Header="ФИО сотрудника" Binding="{Binding StaffFullName}" Width="2*"/>
+                <DataGridTextColumn Header="Дата выполнения" Binding="{Binding CompletionDate, StringFormat='{}{0:dd.MM.yyyy}'}" Width="Auto"/>
+                <DataGridTextColumn Header="Имя клиента" Binding="{Binding ClientFullName}" Width="2*"/>
+                <DataGridTextColumn Header="Итоговая стоимость" Binding="{Binding TotalPrice}" Width="Auto"/>
+                <DataGridTextColumn Header="Статус заказа" Binding="{Binding Status}" Width="*"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- Кнопки для действий -->
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="Добавить" Margin="0,0,10,0" Click="AddOrder_Click"/>
+            <Button Content="Редактировать" Margin="0,0,10,0" Click="EditOrder_Click"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

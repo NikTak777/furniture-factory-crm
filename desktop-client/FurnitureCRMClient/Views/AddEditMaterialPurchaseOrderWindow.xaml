@@ -1,0 +1,113 @@
+<Window x:Class="FurnitureCRMClient.Views.AddEditMaterialPurchaseOrderWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:FurnitureCRMClient.Views"
+        Title="Оформить/Редактировать заказ сырья" Height="320" Width="400"
+        WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <local:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        <local:NullToVisibilityConverter x:Key="NullToVisibilityConverter"/>
+    </Window.Resources>
+    <Grid Margin="15">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>  <!-- Поставщик -->
+            <RowDefinition Height="Auto"/>  <!-- Сырьё -->
+            <RowDefinition Height="Auto"/>  <!-- Количество -->
+            <RowDefinition Height="Auto"/>  <!-- Статус -->
+            <RowDefinition Height="*"/>     <!-- Заполнитель, чтобы кнопки ушли вниз -->
+            <RowDefinition Height="Auto"/>  <!-- Кнопки -->
+        </Grid.RowDefinitions>
+        <!-- Общая сетка только с двумя колонками: подпись + поле.
+             Третий столбец для единицы измерения делаем локально, только в строке количества. -->
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Поставщик -->
+        <TextBlock Grid.Row="0" Grid.Column="0" Text="Поставщик:" Margin="0,0,10,5"/>
+        <StackPanel Grid.Row="0" Grid.Column="1" Margin="0,0,0,5">
+            <ComboBox ItemsSource="{Binding ExistingSuppliers}"
+                      Height="23"
+                      IsEditable="True"
+                      IsTextSearchEnabled="True"
+                      Text="{Binding Order.Поставщик, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"/>
+            <TextBlock Text="{Binding Errors[Поставщик]}"
+                       Foreground="Red"
+                       FontSize="10"
+                       Margin="0,2,0,0"/>
+        </StackPanel>
+        
+        <!-- Наименование сырья -->
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="Сырьё:" Margin="0,0,10,5"/>
+        <StackPanel Grid.Row="1" Grid.Column="1" Margin="0,0,0,5">
+            <ComboBox ItemsSource="{Binding FilteredMaterialsList}" 
+                      Height="23"
+                      DisplayMemberPath="Наименование_материала"
+                      SelectedItem="{Binding SelectedMaterial, Mode=TwoWay}"
+                      IsEditable="True" 
+                      StaysOpenOnEdit="True"
+                      Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                      IsTextSearchEnabled="False"/>
+            <TextBlock Text="{Binding Errors[Артикул_сырья]}"
+                       Foreground="Red"
+                       FontSize="10"
+                       Margin="0,2,0,0"/>
+        </StackPanel>
+
+        <!-- Количество -->
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="Количество:" Margin="0,0,10,5"/>
+        <!-- Внутренняя сетка только для этой строки: поле количества + единица измерения справа -->
+        <Grid Grid.Row="2" Grid.Column="1" Margin="0,0,0,5">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Горизонтальный контейнер для поля и единицы измерения -->
+            <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Left">
+                <TextBox Width="120"
+                         Height="23"
+                         VerticalAlignment="Top"
+                         Text="{Binding QuantityText, UpdateSourceTrigger=PropertyChanged, ValidatesOnDataErrors=True}"/>
+                
+                <!-- Единица измерения выбранного сырья -->
+                <TextBlock Margin="8,0,0,0"
+                           VerticalAlignment="Center"
+                           Text="{Binding SelectedMaterial.Единица_измерения}"
+                           Visibility="{Binding SelectedMaterial, Converter={StaticResource NullToVisibilityConverter}}"/>
+            </StackPanel>
+
+            <!-- Ошибка в отдельной строке, чтобы не сдвигала поле -->
+            <TextBlock Grid.Row="1"
+                       Text="{Binding Errors[QuantityText]}"
+                       Foreground="Red"
+                       FontSize="10"
+                       Margin="0,2,0,0"
+                       HorizontalAlignment="Left"
+                       Visibility="{Binding Errors[QuantityText], Converter={StaticResource NullToVisibilityConverter}}"/>
+        </Grid>
+
+        <!-- Статус (только при редактировании) -->
+        <TextBlock Grid.Row="3" Grid.Column="0" Text="Статус:" VerticalAlignment="Center" Margin="0,0,10,5" Visibility="{Binding IsEditMode, Converter={StaticResource BoolToVisibilityConverter}}"/>
+        <StackPanel Grid.Row="3" Grid.Column="1" Margin="0,0,0,5"
+                    Visibility="{Binding IsEditMode, Converter={StaticResource BoolToVisibilityConverter}}">
+            <ComboBox Height="23"
+                      ItemsSource="{Binding StatusOptions}"
+                      SelectedItem="{Binding Order.Статус, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+            <TextBlock Text="{Binding Errors[Статус]}"
+                       Foreground="Red"
+                       FontSize="10"
+                       Margin="0,2,0,0"/>
+        </StackPanel>
+
+        <!-- Кнопки -->
+        <StackPanel Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Margin="0,10,0,0">
+            <Button Content="Сохранить" Command="{Binding SaveCommand}" Width="80" Margin="0,0,10,0"/>
+            <Button Content="Отмена" Command="{Binding CancelCommand}" Width="80"/>
+        </StackPanel>
+    </Grid>
+</Window>
