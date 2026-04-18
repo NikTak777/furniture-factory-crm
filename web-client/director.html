@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Панель директора — FurniFlow</title>
+    <link rel="stylesheet" href="css/app.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div>
+          <h1>Панель директора</h1>
+          <div class="meta" id="user-line"></div>
+        </div>
+        <button type="button" class="btn btn-ghost" id="btn-logout">Выйти</button>
+      </header>
+
+      <nav class="tabs" id="tabs" role="tablist" aria-label="Разделы">
+        <button type="button" class="tab active" data-panel="staff" role="tab" aria-selected="true">
+          Учёт сотрудников
+        </button>
+        <button type="button" class="tab" data-panel="nom" role="tab" aria-selected="false">
+          Учёт номенклатуры
+        </button>
+        <button type="button" class="tab" data-panel="prod" role="tab" aria-selected="false">
+          Анализ отчётов о производстве
+        </button>
+        <button type="button" class="tab" data-panel="sales" role="tab" aria-selected="false">
+          Анализ продаж персонала
+        </button>
+      </nav>
+
+      <!-- Сотрудники -->
+      <section class="panel active" id="panel-staff" role="tabpanel">
+        <div class="toolbar">
+          <div class="field">
+            <label class="label" for="st-mode">Список</label>
+            <select id="st-mode">
+              <option value="working">Работающие сотрудники</option>
+              <option value="fired">Уволенные сотрудники</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="label" for="st-position">Должность</label>
+            <select id="st-position"></select>
+          </div>
+          <div class="field" style="flex: 2 1 220px">
+            <label class="label" for="st-search">Поиск по ФИО</label>
+            <input id="st-search" type="text" placeholder="ФИО…" />
+          </div>
+          <button type="button" class="btn btn-secondary" id="st-refresh">Обновить</button>
+        </div>
+        <div class="table-wrap">
+          <table class="data">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>ФИО</th>
+                <th>Должность</th>
+                <th>Логин</th>
+                <th>Учётная запись</th>
+              </tr>
+            </thead>
+            <tbody id="st-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Номенклатура -->
+      <section class="panel" id="panel-nom" role="tabpanel">
+        <div class="toolbar">
+          <div class="field">
+            <label class="label" for="nom-mode">Номенклатура</label>
+            <select id="nom-mode">
+              <option value="produced">Производимые товары</option>
+              <option value="notproduced">Снятые с производства</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="label" for="nom-search">Наименование</label>
+            <input id="nom-search" type="text" placeholder="Поиск…" />
+          </div>
+          <div class="field">
+            <label class="label" for="nom-category">Категория</label>
+            <select id="nom-category"></select>
+          </div>
+          <div class="field">
+            <label class="label" for="nom-min">Цена от</label>
+            <input id="nom-min" type="number" min="0" step="1" placeholder="нет" />
+          </div>
+          <div class="field">
+            <label class="label" for="nom-max">Цена до</label>
+            <input id="nom-max" type="number" min="0" step="1" placeholder="нет" />
+          </div>
+          <button type="button" class="btn btn-secondary" id="nom-clear">Сбросить</button>
+          <button type="button" class="btn btn-secondary" id="nom-refresh">Обновить</button>
+        </div>
+        <div class="table-wrap">
+          <table class="data">
+            <thead>
+              <tr>
+                <th>Артикул</th>
+                <th>Наименование</th>
+                <th>Категория</th>
+                <th>Цвет</th>
+                <th>Размеры</th>
+                <th>Цена</th>
+              </tr>
+            </thead>
+            <tbody id="nom-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Отчёт о производстве -->
+      <section class="panel" id="panel-prod" role="tabpanel">
+        <div class="toolbar">
+          <div class="field">
+            <label class="label" for="prod-from">Период с</label>
+            <input id="prod-from" type="date" />
+          </div>
+          <div class="field">
+            <label class="label" for="prod-to">по</label>
+            <input id="prod-to" type="date" />
+          </div>
+          <button type="button" class="btn btn-primary" id="prod-run" style="width: auto">
+            Сформировать отчёт
+          </button>
+        </div>
+        <div class="stats" id="prod-stats" style="display: none"></div>
+        <div class="chart-row" id="dir-prod-charts-wrap" style="display: none">
+          <div class="chart-cell">
+            <canvas data-chart-role="prod-status"></canvas>
+          </div>
+          <div class="chart-cell">
+            <canvas data-chart-role="prod-products"></canvas>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="data">
+            <thead>
+              <tr>
+                <th>№ заказа</th>
+                <th>Дата</th>
+                <th>Товар</th>
+                <th>Кол‑во</th>
+                <th>Статус</th>
+                <th>Сумма</th>
+              </tr>
+            </thead>
+            <tbody id="prod-body"></tbody>
+          </table>
+        </div>
+        <div class="msg" id="prod-msg"></div>
+      </section>
+
+      <!-- Анализ продаж персонала -->
+      <section class="panel" id="panel-sales" role="tabpanel">
+        <div class="toolbar">
+          <div class="field">
+            <label class="label" for="sale-from">Период с</label>
+            <input id="sale-from" type="date" />
+          </div>
+          <div class="field">
+            <label class="label" for="sale-to">по</label>
+            <input id="sale-to" type="date" />
+          </div>
+          <button type="button" class="btn btn-primary" id="sale-run" style="width: auto">
+            Обновить анализ
+          </button>
+          <button type="button" class="btn btn-secondary" id="sale-clear-mgr" style="width: auto">
+            Сбросить выбор менеджера
+          </button>
+        </div>
+        <p class="subtitle" style="margin: 0 0 12px; color: var(--muted); font-size: 0.9rem">
+          Выберите сотрудника в первой таблице, чтобы во второй увидеть номенклатуру по его заказам за период.
+        </p>
+        <h2 style="font-size: 1rem; margin: 14px 0 8px">По менеджерам (оформленные заказы)</h2>
+        <div class="table-wrap">
+          <table class="data">
+            <thead>
+              <tr>
+                <th>Сотрудник</th>
+                <th>Всего заказов</th>
+                <th>Выполнено</th>
+                <th>Отменено</th>
+                <th>Выручка (вып.)</th>
+              </tr>
+            </thead>
+            <tbody id="sale-mgr-body"></tbody>
+          </table>
+        </div>
+        <h2 style="font-size: 1rem; margin: 18px 0 8px">По номенклатуре</h2>
+        <div class="table-wrap">
+          <table class="data">
+            <thead>
+              <tr>
+                <th>Товар</th>
+                <th>Заказов</th>
+                <th>Количество</th>
+                <th>Выполнено</th>
+                <th>Выручка</th>
+              </tr>
+            </thead>
+            <tbody id="sale-pr-body"></tbody>
+          </table>
+        </div>
+        <div class="msg" id="sale-msg"></div>
+      </section>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="js/chart-theme.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/production-charts.js"></script>
+    <script src="js/director.js"></script>
+  </body>
+</html>

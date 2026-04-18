@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Панель менеджера — FurniFlow</title>
+    <link rel="stylesheet" href="css/app.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div>
+          <h1>Панель менеджера</h1>
+          <div class="meta" id="user-line"></div>
+        </div>
+        <button type="button" class="btn btn-ghost" id="btn-logout">Выйти</button>
+      </header>
+
+      <nav class="tabs" id="tabs" role="tablist" aria-label="Разделы">
+        <button type="button" class="tab active" data-panel="nom" role="tab" aria-selected="true">
+          Номенклатура
+        </button>
+        <button type="button" class="tab" data-panel="orders" role="tab" aria-selected="false">
+          Заказы
+        </button>
+        <button type="button" class="tab" data-panel="clients" role="tab" aria-selected="false">
+          Клиенты
+        </button>
+        <button type="button" class="tab" data-panel="reports" role="tab" aria-selected="false">
+          Отчёты о производстве
+        </button>
+      </nav>
+
+      <section class="panel active" id="panel-nom" role="tabpanel">
+        <div class="toolbar">
+          <div class="field">
+            <label class="label" for="nom-search">Наименование</label>
+            <input id="nom-search" type="text" placeholder="Поиск…" />
+          </div>
+          <div class="field">
+            <label class="label" for="nom-category">Категория</label>
+            <select id="nom-category"></select>
+          </div>
+          <div class="field">
+            <label class="label" for="nom-min">Цена от</label>
+            <input id="nom-min" type="number" min="0" step="1" placeholder="нет" />
+          </div>
+          <div class="field">
+            <label class="label" for="nom-max">Цена до</label>
+            <input id="nom-max" type="number" min="0" step="1" placeholder="нет" />
+          </div>
+          <button type="button" class="btn btn-secondary" id="nom-clear">Сбросить</button>
+          <button type="button" class="btn btn-secondary" id="nom-refresh">Обновить</button>
+        </div>
+        <div class="table-wrap">
+          <table class="data">
+            <thead>
+              <tr>
+                <th>Наименование</th>
+                <th>Категория</th>
+                <th>Цвет</th>
+                <th>Размеры</th>
+                <th>Цена</th>
+              </tr>
+            </thead>
+            <tbody id="nom-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel" id="panel-orders" role="tabpanel">
+        <div class="toolbar">
+          <div class="field">
+            <label class="label" for="ord-status">Статус</label>
+            <select id="ord-status"></select>
+          </div>
+          <div class="field">
+            <label class="label" for="ord-product">Товар</label>
+            <input id="ord-product" type="text" placeholder="Фильтр по названию" />
+          </div>
+          <div class="field">
+            <label class="label" for="ord-client">Клиент</label>
+            <input id="ord-client" type="text" placeholder="ФИО клиента" />
+          </div>
+          <button type="button" class="btn btn-secondary" id="ord-clear">Сбросить</button>
+          <button type="button" class="btn btn-secondary" id="ord-refresh">Обновить</button>
+        </div>
+        <div class="table-wrap">
+          <table class="data">
+            <thead>
+              <tr>
+                <th>№</th>
+                <th>Дата</th>
+                <th>Товар</th>
+                <th>Кол‑во</th>
+                <th>Статус</th>
+                <th>Клиент</th>
+                <th>Сотрудник</th>
+                <th>Сумма</th>
+                <th>Выполнен</th>
+              </tr>
+            </thead>
+            <tbody id="ord-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel" id="panel-clients" role="tabpanel">
+        <div class="toolbar">
+          <div class="field" style="flex: 2 1 220px">
+            <label class="label" for="cl-search">Поиск (ФИО, телефон, email)</label>
+            <input id="cl-search" type="text" placeholder="Например: Иванов или 9…" />
+          </div>
+          <button type="button" class="btn btn-primary" id="cl-add" style="width: auto">
+            Добавить клиента
+          </button>
+          <button type="button" class="btn btn-secondary" id="cl-refresh">Обновить</button>
+        </div>
+        <div class="table-wrap">
+          <table class="data">
+            <thead>
+              <tr>
+                <th>ФИО</th>
+                <th>Телефон</th>
+                <th>Email</th>
+                <th>Адрес</th>
+                <th>Регистрация</th>
+              </tr>
+            </thead>
+            <tbody id="cl-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel" id="panel-reports" role="tabpanel">
+        <div class="toolbar">
+          <div class="field">
+            <label class="label" for="rep-from">Период с</label>
+            <input id="rep-from" type="date" />
+          </div>
+          <div class="field">
+            <label class="label" for="rep-to">по</label>
+            <input id="rep-to" type="date" />
+          </div>
+          <button type="button" class="btn btn-primary" id="rep-run" style="width: auto">
+            Сформировать
+          </button>
+        </div>
+        <div class="stats" id="rep-stats" style="display: none"></div>
+        <div class="chart-row" id="mgr-charts-wrap" style="display: none">
+          <div class="chart-cell">
+            <canvas data-chart-role="prod-status"></canvas>
+          </div>
+          <div class="chart-cell">
+            <canvas data-chart-role="prod-products"></canvas>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="data">
+            <thead>
+              <tr>
+                <th>№ заказа</th>
+                <th>Дата</th>
+                <th>Товар</th>
+                <th>Кол‑во</th>
+                <th>Статус</th>
+                <th>Сумма</th>
+              </tr>
+            </thead>
+            <tbody id="rep-body"></tbody>
+          </table>
+        </div>
+        <div class="msg" id="rep-msg"></div>
+      </section>
+    </div>
+
+    <div class="modal-backdrop" id="cl-modal" aria-hidden="true">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="cl-modal-title">
+        <h2 id="cl-modal-title">Новый клиент</h2>
+        <div class="field">
+          <label class="label" for="cl-fn">ФИО</label>
+          <input id="cl-fn" type="text" />
+        </div>
+        <div class="field">
+          <label class="label" for="cl-phone">Телефон (цифры)</label>
+          <input id="cl-phone" type="text" inputmode="numeric" />
+        </div>
+        <div class="field">
+          <label class="label" for="cl-email">Email</label>
+          <input id="cl-email" type="email" />
+        </div>
+        <div class="field">
+          <label class="label" for="cl-address">Адрес</label>
+          <textarea id="cl-address" rows="3"></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" id="cl-cancel">Отмена</button>
+          <button type="button" class="btn btn-primary" id="cl-save" style="width: auto">
+            Сохранить
+          </button>
+        </div>
+        <div class="msg error" id="cl-modal-msg"></div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="js/chart-theme.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/production-charts.js"></script>
+    <script src="js/manager.js"></script>
+  </body>
+</html>

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Панель кладовщика — FurniFlow</title>
+    <link rel="stylesheet" href="css/app.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div>
+          <h1>Панель кладовщика</h1>
+          <div class="meta" id="user-line"></div>
+        </div>
+        <button type="button" class="btn btn-ghost" id="btn-logout">Выйти</button>
+      </header>
+
+      <nav class="tabs" id="tabs" role="tablist">
+        <button type="button" class="tab active" data-panel="stock">Учёт сырья на складе</button>
+        <button type="button" class="tab" data-panel="orders">Оформление закупки сырья</button>
+        <button type="button" class="tab" data-panel="needs">Анализ потребности в материалах</button>
+      </nav>
+
+      <!-- Склад -->
+      <section class="panel active" id="panel-stock" role="tabpanel">
+        <div class="toolbar">
+          <div class="field">
+            <label class="label" for="st-search">Наименование</label>
+            <input id="st-search" type="text" placeholder="Поиск…" />
+          </div>
+          <div class="field">
+            <label class="label" for="st-unit">Единица</label>
+            <select id="st-unit"></select>
+          </div>
+          <div class="field">
+            <label class="label" for="st-min">Кол-во от</label>
+            <input id="st-min" type="number" min="0" step="1" placeholder="нет" />
+          </div>
+          <div class="field">
+            <label class="label" for="st-max">Кол-во до</label>
+            <input id="st-max" type="number" min="0" step="1" placeholder="нет" />
+          </div>
+          <button type="button" class="btn btn-secondary" id="st-clear">Сбросить</button>
+          <button type="button" class="btn btn-primary" id="st-add" style="width: auto">Добавить сырьё</button>
+          <button type="button" class="btn btn-secondary" id="st-refresh">Обновить</button>
+        </div>
+        <div class="table-wrap">
+          <table class="data">
+            <thead>
+              <tr>
+                <th>Артикул</th>
+                <th>Наименование</th>
+                <th>Ед. изм.</th>
+                <th>На складе</th>
+                <th style="min-width: 160px">Действия</th>
+              </tr>
+            </thead>
+            <tbody id="st-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Заказы сырья -->
+      <section class="panel" id="panel-orders" role="tabpanel">
+        <div class="toolbar">
+          <div class="field">
+            <label class="label" for="mo-sup">Поставщик</label>
+            <input id="mo-sup" type="text" placeholder="Фильтр" />
+          </div>
+          <div class="field">
+            <label class="label" for="mo-mat">Сырьё</label>
+            <input id="mo-mat" type="text" placeholder="Название" />
+          </div>
+          <div class="field">
+            <label class="label" for="mo-staff">Оформитель</label>
+            <select id="mo-staff"></select>
+          </div>
+          <div class="field">
+            <label class="label" for="mo-status">Статус</label>
+            <select id="mo-status"></select>
+          </div>
+          <div class="field">
+            <label class="label" for="mo-from">Дата с</label>
+            <input id="mo-from" type="date" />
+          </div>
+          <div class="field">
+            <label class="label" for="mo-to">по</label>
+            <input id="mo-to" type="date" />
+          </div>
+          <button type="button" class="btn btn-secondary" id="mo-clear">Сбросить</button>
+          <button type="button" class="btn btn-primary" id="mo-add" style="width: auto">Новый заказ</button>
+          <button type="button" class="btn btn-secondary" id="mo-refresh">Обновить</button>
+        </div>
+        <div class="table-wrap">
+          <table class="data">
+            <thead>
+              <tr>
+                <th>№</th>
+                <th>Дата</th>
+                <th>Поставщик</th>
+                <th>Сырьё</th>
+                <th>Кол-во</th>
+                <th>Оформитель</th>
+                <th>Статус</th>
+                <th style="min-width: 100px">Действия</th>
+              </tr>
+            </thead>
+            <tbody id="mo-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Потребность -->
+      <section class="panel" id="panel-needs" role="tabpanel">
+        <div class="toolbar">
+          <div class="field">
+            <label class="label" for="nd-from">Заказы с</label>
+            <input id="nd-from" type="date" />
+          </div>
+          <div class="field">
+            <label class="label" for="nd-to">по</label>
+            <input id="nd-to" type="date" />
+          </div>
+          <button type="button" class="btn btn-primary" id="nd-run" style="width: auto">Рассчитать потребность</button>
+        </div>
+        <p class="subtitle" style="margin: 0 0 12px; color: var(--muted); font-size: 0.9rem">
+          Учитываются заказы в статусе «В обработке». Ниже — топ потребления за последние 3 месяца.
+        </p>
+        <h2 style="font-size: 1rem; margin: 10px 0 8px">Потребность по заказам (период)</h2>
+        <div class="chart-row" id="nd-charts-needs-wrap" style="display: none">
+          <div class="chart-cell">
+            <canvas id="chart-nd-needs"></canvas>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="data">
+            <thead>
+              <tr>
+                <th>Материал</th>
+                <th>Ед.</th>
+                <th>На складе</th>
+                <th>Нужно</th>
+                <th>Остаток − нужно</th>
+              </tr>
+            </thead>
+            <tbody id="nd-body"></tbody>
+          </table>
+        </div>
+        <h2 style="font-size: 1rem; margin: 18px 0 8px">Совокупное потребление (3 мес.)</h2>
+        <div class="chart-row" id="nd-charts-usage-wrap" style="display: none">
+          <div class="chart-cell">
+            <canvas id="chart-nd-usage"></canvas>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="data">
+            <thead>
+              <tr>
+                <th>Материал</th>
+                <th>Ед.</th>
+                <th>Всего по спецификациям</th>
+              </tr>
+            </thead>
+            <tbody id="nd-usage-body"></tbody>
+          </table>
+        </div>
+        <div class="msg" id="nd-msg"></div>
+      </section>
+    </div>
+
+    <!-- Модальное окно: сырьё -->
+    <div class="modal-backdrop" id="mat-modal" aria-hidden="true">
+      <div class="modal" role="dialog" aria-labelledby="mat-modal-title">
+        <h2 id="mat-modal-title">Сырьё</h2>
+        <input type="hidden" id="mat-edit-id" value="" />
+        <div class="field">
+          <label class="label" for="mat-name">Наименование</label>
+          <input id="mat-name" type="text" />
+        </div>
+        <div class="field">
+          <label class="label" for="mat-unit">Единица измерения</label>
+          <input id="mat-unit" type="text" placeholder="например, кг, м²" />
+        </div>
+        <div class="field">
+          <label class="label" for="mat-qty">Количество на складе</label>
+          <input id="mat-qty" type="number" min="0" step="1" />
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" id="mat-cancel">Отмена</button>
+          <button type="button" class="btn btn-primary" id="mat-save" style="width: auto">Сохранить</button>
+        </div>
+        <div class="msg error" id="mat-modal-msg"></div>
+      </div>
+    </div>
+
+    <!-- Новый заказ сырья -->
+    <div class="modal-backdrop" id="mo-modal-new" aria-hidden="true">
+      <div class="modal" role="dialog" aria-labelledby="mo-new-title">
+        <h2 id="mo-new-title">Новый заказ сырья</h2>
+        <div class="field">
+          <label class="label" for="mo-new-sup">Поставщик</label>
+          <input id="mo-new-sup" type="text" />
+        </div>
+        <div class="field">
+          <label class="label" for="mo-new-mat">Сырьё</label>
+          <select id="mo-new-mat"></select>
+        </div>
+        <div class="field">
+          <label class="label" for="mo-new-qty">Количество</label>
+          <input id="mo-new-qty" type="number" min="1" step="1" value="1" />
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" id="mo-new-cancel">Отмена</button>
+          <button type="button" class="btn btn-primary" id="mo-new-save" style="width: auto">Оформить</button>
+        </div>
+        <div class="msg error" id="mo-new-msg"></div>
+      </div>
+    </div>
+
+    <!-- Редактирование заказа -->
+    <div class="modal-backdrop" id="mo-modal-edit" aria-hidden="true">
+      <div class="modal" role="dialog">
+        <h2>Изменить заказ</h2>
+        <input type="hidden" id="mo-ed-id" />
+        <input type="hidden" id="mo-ed-staff" />
+        <div class="field">
+          <label class="label" for="mo-ed-sup">Поставщик</label>
+          <input id="mo-ed-sup" type="text" />
+        </div>
+        <div class="field">
+          <label class="label" for="mo-ed-mat">Сырьё</label>
+          <select id="mo-ed-mat"></select>
+        </div>
+        <div class="field">
+          <label class="label" for="mo-ed-qty">Количество</label>
+          <input id="mo-ed-qty" type="number" min="1" step="1" />
+        </div>
+        <div class="field">
+          <label class="label" for="mo-ed-status">Статус</label>
+          <select id="mo-ed-status">
+            <option value="Ожидает поставки">Ожидает поставки</option>
+            <option value="Доставлен">Доставлен</option>
+            <option value="Отменен">Отменен</option>
+          </select>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" id="mo-ed-cancel">Отмена</button>
+          <button type="button" class="btn btn-primary" id="mo-ed-save" style="width: auto">Сохранить</button>
+        </div>
+        <div class="msg error" id="mo-ed-msg"></div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="js/chart-theme.js"></script>
+    <script src="js/common.js"></script>
+    <script src="js/material-charts.js"></script>
+    <script src="js/warehouse.js"></script>
+  </body>
+</html>
