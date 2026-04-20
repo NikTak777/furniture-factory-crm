@@ -58,6 +58,18 @@
   const stMode = document.getElementById("st-mode");
   const stPosition = document.getElementById("st-position");
   const stSearch = document.getElementById("st-search");
+  const stAddBtn = document.getElementById("st-add");
+  const stAddModal = document.getElementById("st-modal-add");
+  const stAddName = document.getElementById("st-add-name");
+  const stAddPosition = document.getElementById("st-add-position");
+  const stAddMsg = document.getElementById("st-add-msg");
+  const stEditModal = document.getElementById("st-modal-edit");
+  const stEditId = document.getElementById("st-edit-id");
+  const stEditName = document.getElementById("st-edit-name");
+  const stEditPosition = document.getElementById("st-edit-position");
+  const stEditUsername = document.getElementById("st-edit-username");
+  const stEditPassword = document.getElementById("st-edit-password");
+  const stEditMsg = document.getElementById("st-edit-msg");
 
   function rebuildPositionFilter() {
     const prev = stPosition.value;
@@ -93,24 +105,222 @@
     });
   }
 
-  function accountLabel(s) {
-    const ua = s.userAccount;
-    if (!ua) return "Нет записи";
-    return ua.isActive ? "Активна" : "Заблокирована";
+  function maskedPassword(s) {
+    const pwd = s.userAccount?.password;
+    if (!pwd) return "—";
+    return "••••••••";
+  }
+
+  function generateRandomPassword(length = 12) {
+    const chars =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()";
+    let result = "";
+    for (let i = 0; i < length; i += 1) {
+      const idx = Math.floor(Math.random() * chars.length);
+      result += chars[idx];
+    }
+    return result;
+  }
+
+  function generateRandomUsername(baseName, length = 6) {
+    const source = (baseName || "").trim();
+    const firstWord = source.split(/\s+/).find(Boolean) || "user";
+    let suffix = "";
+    for (let i = 0; i < length; i += 1) {
+      suffix += String(Math.floor(Math.random() * 10));
+    }
+    return `${firstWord}${suffix}`;
   }
 
   function renderStaff() {
     tbodyClear(stBody);
     staffFiltered().forEach((s) => {
       const ua = s.userAccount;
-      trCells(stBody, [
-        s.staffId,
-        s.fullName,
-        s.position,
-        ua && ua.username ? ua.username : "—",
-        accountLabel(s),
-      ]);
+      const tr = document.createElement("tr");
+      [s.staffId, s.fullName, s.position, ua && ua.username ? ua.username : "—"].forEach((text) => {
+        const td = document.createElement("td");
+        td.textContent = text == null ? "—" : String(text);
+        tr.appendChild(td);
+      });
+
+      const tdPwd = document.createElement("td");
+      tdPwd.className = "cell-actions";
+      const pwdLabel = document.createElement("span");
+      pwdLabel.textContent = maskedPassword(s);
+      tdPwd.appendChild(pwdLabel);
+      if (s.userAccount?.password) {
+        const copyPwdBtn = document.createElement("button");
+        copyPwdBtn.type = "button";
+        copyPwdBtn.className = "btn btn-secondary btn-inline";
+        copyPwdBtn.textContent = "Копировать";
+        copyPwdBtn.addEventListener("click", () => copyStaffPassword(s));
+        tdPwd.appendChild(copyPwdBtn);
+      }
+      tr.appendChild(tdPwd);
+
+      const tdAct = document.createElement("td");
+      tdAct.className = "cell-actions";
+
+      if (stMode.value === "working") {
+        const editBtn = document.createElement("button");
+        editBtn.type = "button";
+        editBtn.className = "btn btn-secondary btn-inline";
+        editBtn.textContent = "Редактировать";
+        editBtn.addEventListener("click", () => openEditModal(s));
+        tdAct.appendChild(editBtn);
+
+        const fireBtn = document.createElement("button");
+        fireBtn.type = "button";
+        fireBtn.className = "btn btn-secondary btn-inline";
+        fireBtn.textContent = "Уволить";
+        fireBtn.addEventListener("click", () => fireStaff(s));
+        tdAct.appendChild(fireBtn);
+      } else {
+        const reinstateBtn = document.createElement("button");
+        reinstateBtn.type = "button";
+        reinstateBtn.className = "btn btn-secondary btn-inline";
+        reinstateBtn.textContent = "Вернуть в штат";
+        reinstateBtn.addEventListener("click", () => reinstateStaff(s));
+        tdAct.appendChild(reinstateBtn);
+      }
+
+      tr.appendChild(tdAct);
+      stBody.appendChild(tr);
     });
+  }
+
+  function closeAddModal() {
+    stAddModal.classList.remove("open");
+    stAddModal.setAttribute("aria-hidden", "true");
+    stAddMsg.textContent = "";
+  }
+
+  function openAddModal() {
+    stAddName.value = "";
+    stAddPosition.value = "";
+    stAddMsg.textContent = "";
+    stAddModal.classList.add("open");
+    stAddModal.setAttribute("aria-hidden", "false");
+    stAddName.focus();
+  }
+
+  function closeEditModal() {
+    stEditModal.classList.remove("open");
+    stEditModal.setAttribute("aria-hidden", "true");
+    stEditMsg.textContent = "";
+  }
+
+  function openEditModal(staff) {
+    stEditId.value = String(staff.staffId);
+    stEditName.value = staff.fullName || "";
+    stEditPosition.value = staff.position || "";
+    stEditUsername.value = staff.userAccount?.username || "";
+    stEditPassword.value = staff.userAccount?.password || "";
+    stEditMsg.textContent = "";
+    stEditModal.classList.add("open");
+    stEditModal.setAttribute("aria-hidden", "false");
+    stEditName.focus();
+  }
+
+  async function addStaff() {
+    const fullName = stAddName.value.trim();
+    const position = stAddPosition.value;
+    if (!fullName || !position) {
+      stAddMsg.textContent = "Укажите ФИО и должность.";
+      return;
+    }
+    try {
+      await apiJson("staff", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fullName, position }),
+      });
+      closeAddModal();
+      await loadStaff();
+    } catch (e) {
+      stAddMsg.textContent = e.message || "Ошибка добавления сотрудника";
+    }
+  }
+
+  async function saveEditedStaff() {
+    const staffId = Number(stEditId.value);
+    const fullName = stEditName.value.trim();
+    const position = stEditPosition.value;
+    const username = stEditUsername.value.trim();
+    const password = stEditPassword.value.trim();
+
+    if (Number.isNaN(staffId) || !fullName || !position) {
+      stEditMsg.textContent = "Укажите корректные ФИО и должность.";
+      return;
+    }
+    if (!username || !password) {
+      stEditMsg.textContent = "Логин и пароль не могут быть пустыми.";
+      return;
+    }
+
+    try {
+      await apiJson(`staff/${staffId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          staffId,
+          fullName,
+          position,
+          userAccount: {
+            staffId,
+            username,
+            password,
+          },
+        }),
+      });
+      closeEditModal();
+      await loadStaff();
+    } catch (e) {
+      stEditMsg.textContent = e.message || "Ошибка сохранения сотрудника";
+    }
+  }
+
+  async function copyStaffPassword(staff) {
+    const pwd = staff?.userAccount?.password;
+    if (!pwd) {
+      alert("У этого сотрудника нет доступного пароля для копирования.");
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(pwd);
+    } catch {
+      alert("Не удалось скопировать пароль в буфер обмена.");
+    }
+  }
+
+  async function fireStaff(staff) {
+    const ok = window.confirm(
+      `Уволить сотрудника "${staff.fullName}"? Действие деактивирует его учётную запись.`
+    );
+    if (!ok) return;
+    try {
+      await apiJson(`staff/${staff.staffId}`, { method: "DELETE" });
+      await loadStaff();
+    } catch (e) {
+      alert(e.message || "Не удалось уволить сотрудника");
+    }
+  }
+
+  async function reinstateStaff(staff) {
+    const ok = window.confirm(
+      `Вернуть сотрудника "${staff.fullName}" в штат?`
+    );
+    if (!ok) return;
+    try {
+      await apiJson(`staff/${staff.staffId}/reinstate`, { method: "PUT" });
+      await loadStaff();
+    } catch (e) {
+      alert(e.message || "Не удалось вернуть сотрудника в штат");
+    }
+  }
+
+  function syncStaffModeControls() {
+    stAddBtn.style.display = stMode.value === "working" ? "inline-flex" : "none";
   }
 
   async function loadStaff() {
@@ -118,6 +328,7 @@
       stMode.value === "fired" ? "staff/fired" : "staff";
     staffList = await apiJson(endpoint, { method: "GET" });
     rebuildPositionFilter();
+    syncStaffModeControls();
     renderStaff();
   }
 
@@ -125,6 +336,27 @@
   stPosition.addEventListener("change", renderStaff);
   stSearch.addEventListener("input", renderStaff);
   document.getElementById("st-refresh").addEventListener("click", loadStaff);
+  stAddBtn.addEventListener("click", openAddModal);
+  document.getElementById("st-add-cancel").addEventListener("click", closeAddModal);
+  document.getElementById("st-add-save").addEventListener("click", addStaff);
+  stAddModal.addEventListener("click", (e) => {
+    if (e.target === stAddModal) closeAddModal();
+  });
+  document.getElementById("st-edit-cancel").addEventListener("click", closeEditModal);
+  document.getElementById("st-edit-save").addEventListener("click", saveEditedStaff);
+  document
+    .getElementById("st-edit-regen-username")
+    .addEventListener("click", () => {
+      stEditUsername.value = generateRandomUsername(stEditName.value);
+    });
+  document
+    .getElementById("st-edit-regen-password")
+    .addEventListener("click", () => {
+      stEditPassword.value = generateRandomPassword();
+    });
+  stEditModal.addEventListener("click", (e) => {
+    if (e.target === stEditModal) closeEditModal();
+  });
 
   /* ---------- Номенклатура ---------- */
 

@@ -49,6 +49,9 @@
             <label class="label" for="st-search">Поиск по ФИО</label>
             <input id="st-search" type="text" placeholder="ФИО…" />
           </div>
+          <button type="button" class="btn btn-primary" id="st-add" style="width: auto">
+            Добавить сотрудника
+          </button>
           <button type="button" class="btn btn-secondary" id="st-refresh">Обновить</button>
         </div>
         <div class="table-wrap">
@@ -59,7 +62,8 @@
                 <th>ФИО</th>
                 <th>Должность</th>
                 <th>Логин</th>
-                <th>Учётная запись</th>
+                <th>Пароль</th>
+                <th>Действия</th>
               </tr>
             </thead>
             <tbody id="st-body"></tbody>
@@ -208,6 +212,77 @@
         </div>
         <div class="msg" id="sale-msg"></div>
       </section>
+    </div>
+
+    <div class="modal-backdrop" id="st-modal-add" aria-hidden="true">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="st-modal-add-title">
+        <h2 id="st-modal-add-title">Добавить сотрудника</h2>
+        <div class="field">
+          <label class="label" for="st-add-name">ФИО</label>
+          <input id="st-add-name" type="text" maxlength="100" />
+        </div>
+        <div class="field">
+          <label class="label" for="st-add-position">Должность</label>
+          <select id="st-add-position">
+            <option value="">Выберите должность</option>
+            <option value="Менеджер">Менеджер</option>
+            <option value="Кладовщик">Кладовщик</option>
+            <option value="Директор">Директор</option>
+          </select>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" id="st-add-cancel">Отмена</button>
+          <button type="button" class="btn btn-primary" id="st-add-save" style="width: auto">
+            Сохранить
+          </button>
+        </div>
+        <div class="msg error" id="st-add-msg"></div>
+      </div>
+    </div>
+
+    <div class="modal-backdrop" id="st-modal-edit" aria-hidden="true">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="st-modal-edit-title">
+        <h2 id="st-modal-edit-title">Редактировать сотрудника</h2>
+        <input id="st-edit-id" type="hidden" />
+        <div class="field">
+          <label class="label" for="st-edit-name">ФИО</label>
+          <input id="st-edit-name" type="text" maxlength="100" />
+        </div>
+        <div class="field">
+          <label class="label" for="st-edit-position">Должность</label>
+          <select id="st-edit-position">
+            <option value="">Выберите должность</option>
+            <option value="Менеджер">Менеджер</option>
+            <option value="Кладовщик">Кладовщик</option>
+            <option value="Директор">Директор</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="label" for="st-edit-username">Логин</label>
+          <div style="display: flex; gap: 8px; align-items: center">
+            <input id="st-edit-username" type="text" maxlength="64" />
+            <button type="button" class="btn btn-secondary" id="st-edit-regen-username" style="width: auto">
+              Перегенерировать
+            </button>
+          </div>
+        </div>
+        <div class="field">
+          <label class="label" for="st-edit-password">Пароль</label>
+          <div style="display: flex; gap: 8px; align-items: center">
+            <input id="st-edit-password" type="text" maxlength="128" />
+            <button type="button" class="btn btn-secondary" id="st-edit-regen-password" style="width: auto">
+              Перегенерировать
+            </button>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" id="st-edit-cancel">Отмена</button>
+          <button type="button" class="btn btn-primary" id="st-edit-save" style="width: auto">
+            Сохранить
+          </button>
+        </div>
+        <div class="msg error" id="st-edit-msg"></div>
+      </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
