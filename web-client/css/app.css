@@ -1,5 +1,7 @@
 :root {
   --bg: #0f172a;
+  --bg-glow-indigo: #312e81;
+  --bg-glow-sky: #0ea5e9;
   --surface: #1e293b;
   --surface2: #334155;
   --text: #f8fafc;
@@ -19,13 +21,62 @@
   box-sizing: border-box;
 }
 
+html {
+  background: var(--bg);
+}
+
 body {
   margin: 0;
   min-height: 100vh;
   font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
-  background: radial-gradient(1200px 600px at 10% -10%, #312e81 0%, transparent 55%),
-    radial-gradient(900px 500px at 110% 10%, #0ea5e9 0%, transparent 50%), var(--bg);
+  background: transparent;
   color: var(--text);
+  position: relative;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(700px 380px at 50% 102%, rgba(236, 72, 153, 0.18) 0%, transparent 55%),
+    radial-gradient(1000px 520px at 5% 85%, rgba(99, 102, 241, 0.42) 0%, transparent 52%),
+    radial-gradient(800px 480px at 92% 92%, rgba(20, 184, 166, 0.34) 0%, transparent 50%),
+    radial-gradient(950px 520px at -5% 55%, rgba(59, 130, 246, 0.28) 0%, transparent 48%),
+    radial-gradient(1200px 600px at 10% -12%, var(--bg-glow-indigo) 0%, transparent 55%),
+    radial-gradient(900px 500px at 108% 8%, var(--bg-glow-sky) 0%, transparent 50%);
+  animation: ambient-bg-shift 36s ease-in-out infinite alternate;
+  will-change: transform, filter;
+}
+
+body > *:not(.modal-backdrop) {
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes ambient-bg-shift {
+  0% {
+    filter: hue-rotate(-6deg) brightness(1);
+    transform: scale(1) translate(0, 0);
+  }
+  50% {
+    filter: hue-rotate(14deg) brightness(1.04);
+    transform: scale(1.02) translate(-0.8%, 0.5%);
+  }
+  100% {
+    filter: hue-rotate(-4deg) brightness(1.02);
+    transform: scale(1.01) translate(0.4%, -0.3%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::before {
+    animation: none;
+    filter: none;
+    transform: none;
+  }
 }
 
 a {
