@@ -110,10 +110,16 @@
                 <th>Цвет</th>
                 <th>Размеры</th>
                 <th>Цена</th>
+                <th>Действия</th>
               </tr>
             </thead>
             <tbody id="nom-body"></tbody>
           </table>
+        </div>
+        <div class="toolbar" style="margin-top: 12px; justify-content: flex-end">
+          <button type="button" class="btn btn-primary" id="nom-add" style="width: auto">
+            Добавить
+          </button>
         </div>
       </section>
 
@@ -282,6 +288,73 @@
           </button>
         </div>
         <div class="msg error" id="st-edit-msg"></div>
+      </div>
+    </div>
+
+    <div class="modal-backdrop" id="nom-modal-add" aria-hidden="true">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="nom-modal-add-title">
+        <h2 id="nom-modal-add-title">Добавить номенклатуру</h2>
+        <div class="field">
+          <label class="label" for="nom-add-name">Наименование</label>
+          <input id="nom-add-name" type="text" maxlength="100" />
+        </div>
+        <div class="field">
+          <label class="label" for="nom-add-category">Категория</label>
+          <input id="nom-add-category" type="text" maxlength="50" />
+        </div>
+        <div class="field">
+          <label class="label" for="nom-add-color">Цвет</label>
+          <input id="nom-add-color" type="text" maxlength="50" />
+        </div>
+        <div class="field">
+          <label class="label" for="nom-add-dimensions">Размеры</label>
+          <input id="nom-add-dimensions" type="text" maxlength="50" />
+        </div>
+        <div class="field">
+          <label class="label" for="nom-add-price">Цена</label>
+          <input id="nom-add-price" type="number" min="0" step="1" />
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" id="nom-add-cancel">Отмена</button>
+          <button type="button" class="btn btn-primary" id="nom-add-save" style="width: auto">
+            Сохранить
+          </button>
+        </div>
+        <div class="msg error" id="nom-add-msg"></div>
+      </div>
+    </div>
+
+    <div class="modal-backdrop" id="nom-modal-edit" aria-hidden="true">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="nom-modal-edit-title">
+        <h2 id="nom-modal-edit-title">Редактировать номенклатуру</h2>
+        <input id="nom-edit-id" type="hidden" />
+        <div class="field">
+          <label class="label" for="nom-edit-name">Наименование</label>
+          <input id="nom-edit-name" type="text" maxlength="100" />
+        </div>
+        <div class="field">
+          <label class="label" for="nom-edit-category">Категория</label>
+          <select id="nom-edit-category"></select>
+        </div>
+        <div class="field">
+          <label class="label" for="nom-edit-color">Цвет</label>
+          <input id="nom-edit-color" type="text" maxlength="50" />
+        </div>
+        <div class="field">
+          <label class="label" for="nom-edit-dimensions">Размеры</label>
+          <input id="nom-edit-dimensions" type="text" maxlength="50" />
+        </div>
+        <div class="field">
+          <label class="label" for="nom-edit-price">Цена</label>
+          <input id="nom-edit-price" type="number" min="0" step="1" />
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" id="nom-edit-cancel">Отмена</button>
+          <button type="button" class="btn btn-primary" id="nom-edit-save" style="width: auto">
+            Сохранить
+          </button>
+        </div>
+        <div class="msg error" id="nom-edit-msg"></div>
       </div>
     </div>
 

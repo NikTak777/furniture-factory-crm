@@ -369,6 +369,11 @@
   const nomCategory = document.getElementById("nom-category");
   const nomMin = document.getElementById("nom-min");
   const nomMax = document.getElementById("nom-max");
+  const nomAddBtn = document.getElementById("nom-add");
+  const nomAddModal = document.getElementById("nom-modal-add");
+  const nomAddMsg = document.getElementById("nom-add-msg");
+  const nomEditModal = document.getElementById("nom-modal-edit");
+  const nomEditMsg = document.getElementById("nom-edit-msg");
 
   function nomRebuildCategories() {
     const prev = nomCategory.value;
@@ -411,15 +416,205 @@
   function renderNom() {
     tbodyClear(nomBody);
     nomFiltered().forEach((p) => {
-      trCells(nomBody, [
+      const tr = document.createElement("tr");
+      [
         p.productId,
         p.name,
         p.category,
         p.color,
         p.dimensions,
         formatMoney(p.price),
-      ]);
+      ].forEach((text) => {
+        const td = document.createElement("td");
+        td.textContent = text == null ? "—" : String(text);
+        tr.appendChild(td);
+      });
+
+      const tdAct = document.createElement("td");
+      tdAct.className = "cell-actions";
+      if (nomMode.value === "produced") {
+        const bEdit = document.createElement("button");
+        bEdit.type = "button";
+        bEdit.className = "btn btn-secondary btn-inline";
+        bEdit.textContent = "Редактировать";
+        bEdit.addEventListener("click", () => openEditNomModal(p));
+        tdAct.appendChild(bEdit);
+
+        const bDel = document.createElement("button");
+        bDel.type = "button";
+        bDel.className = "btn btn-secondary btn-inline";
+        bDel.textContent = "Удалить";
+        bDel.addEventListener("click", () => deleteNom(p));
+        tdAct.appendChild(bDel);
+      } else {
+        const bReinstate = document.createElement("button");
+        bReinstate.type = "button";
+        bReinstate.className = "btn btn-secondary btn-inline";
+        bReinstate.textContent = "Вернуть в производство";
+        bReinstate.addEventListener("click", () => reinstateNom(p));
+        tdAct.appendChild(bReinstate);
+      }
+      tr.appendChild(tdAct);
+      nomBody.appendChild(tr);
     });
+  }
+
+  function nomPayloadFrom(prefix, productId) {
+    const name = document.getElementById(`${prefix}-name`).value.trim();
+    const category = document.getElementById(`${prefix}-category`).value.trim();
+    const color = document.getElementById(`${prefix}-color`).value.trim();
+    const dimensions = document.getElementById(`${prefix}-dimensions`).value.trim();
+    const price = Number(document.getElementById(`${prefix}-price`).value);
+
+    if (!name || !category || !color || !dimensions) {
+      return { error: "Заполните все текстовые поля." };
+    }
+    if (Number.isNaN(price) || price < 0) {
+      return { error: "Цена должна быть неотрицательным числом." };
+    }
+    return {
+      data: {
+        ...(typeof productId === "number" ? { productId } : {}),
+        name,
+        category,
+        color,
+        dimensions,
+        price,
+        isProduced: true,
+      },
+    };
+  }
+
+  function fillNomCategorySelect(selectEl, selectedValue) {
+    const categories = [...nomCategory.options]
+      .map((o) => o.value)
+      .filter((v) => v);
+    selectEl.innerHTML = "";
+    categories.forEach((c) => {
+      const opt = document.createElement("option");
+      opt.value = c;
+      opt.textContent = c;
+      selectEl.appendChild(opt);
+    });
+    if (selectedValue && categories.includes(selectedValue)) {
+      selectEl.value = selectedValue;
+    } else if (categories.length > 0) {
+      selectEl.value = categories[0];
+    }
+  }
+
+  function closeNomAddModal() {
+    nomAddModal.classList.remove("open");
+    nomAddModal.setAttribute("aria-hidden", "true");
+    nomAddMsg.textContent = "";
+  }
+
+  function openNomAddModal() {
+    document.getElementById("nom-add-name").value = "";
+    document.getElementById("nom-add-category").value = "";
+    document.getElementById("nom-add-color").value = "";
+    document.getElementById("nom-add-dimensions").value = "";
+    document.getElementById("nom-add-price").value = "";
+    nomAddMsg.textContent = "";
+    nomAddModal.classList.add("open");
+    nomAddModal.setAttribute("aria-hidden", "false");
+  }
+
+  function closeEditNomModal() {
+    nomEditModal.classList.remove("open");
+    nomEditModal.setAttribute("aria-hidden", "true");
+    nomEditMsg.textContent = "";
+  }
+
+  function openEditNomModal(p) {
+    document.getElementById("nom-edit-id").value = String(p.productId);
+    document.getElementById("nom-edit-name").value = p.name || "";
+    fillNomCategorySelect(
+      document.getElementById("nom-edit-category"),
+      p.category || ""
+    );
+    document.getElementById("nom-edit-color").value = p.color || "";
+    document.getElementById("nom-edit-dimensions").value = p.dimensions || "";
+    document.getElementById("nom-edit-price").value = String(p.price ?? "");
+    nomEditMsg.textContent = "";
+    nomEditModal.classList.add("open");
+    nomEditModal.setAttribute("aria-hidden", "false");
+  }
+
+  async function addNom() {
+    const payload = nomPayloadFrom("nom-add");
+    if (payload.error) {
+      nomAddMsg.textContent = payload.error;
+      return;
+    }
+    try {
+      await apiJson("nomenclature", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload.data),
+      });
+      closeNomAddModal();
+      await loadNom();
+    } catch (e) {
+      nomAddMsg.textContent = e.message || "Ошибка добавления номенклатуры";
+    }
+  }
+
+  async function saveEditNom() {
+    const productId = Number(document.getElementById("nom-edit-id").value);
+    if (Number.isNaN(productId)) {
+      nomEditMsg.textContent = "Некорректный идентификатор номенклатуры.";
+      return;
+    }
+    const payload = nomPayloadFrom("nom-edit", productId);
+    if (payload.error) {
+      nomEditMsg.textContent = payload.error;
+      return;
+    }
+    try {
+      await apiJson(`nomenclature/${productId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload.data),
+      });
+      closeEditNomModal();
+      await loadNom();
+    } catch (e) {
+      nomEditMsg.textContent = e.message || "Ошибка обновления номенклатуры";
+    }
+  }
+
+  async function deleteNom(p) {
+    const ok = window.confirm(
+      `Снять номенклатуру "${p.name}" с производства?`
+    );
+    if (!ok) return;
+    try {
+      await apiJson(`nomenclature/${p.productId}`, { method: "DELETE" });
+      await loadNom();
+    } catch (e) {
+      alert(e.message || "Ошибка удаления номенклатуры");
+    }
+  }
+
+  async function reinstateNom(p) {
+    const ok = window.confirm(
+      `Вернуть номенклатуру "${p.name}" в производство?`
+    );
+    if (!ok) return;
+    try {
+      await apiJson(`nomenclature/${p.productId}/reinstate`, {
+        method: "PUT",
+      });
+      await loadNom();
+    } catch (e) {
+      alert(e.message || "Ошибка возврата номенклатуры в производство");
+    }
+  }
+
+  function syncNomModeControls() {
+    nomAddBtn.style.display =
+      nomMode.value === "produced" ? "inline-flex" : "none";
   }
 
   async function loadNom() {
@@ -429,6 +624,7 @@
         : "nomenclature";
     nomenclature = await apiJson(path, { method: "GET" });
     nomRebuildCategories();
+    syncNomModeControls();
     renderNom();
   }
 
@@ -447,6 +643,17 @@
     renderNom();
   });
   document.getElementById("nom-refresh").addEventListener("click", loadNom);
+  nomAddBtn.addEventListener("click", openNomAddModal);
+  document.getElementById("nom-add-cancel").addEventListener("click", closeNomAddModal);
+  document.getElementById("nom-add-save").addEventListener("click", addNom);
+  nomAddModal.addEventListener("click", (e) => {
+    if (e.target === nomAddModal) closeNomAddModal();
+  });
+  document.getElementById("nom-edit-cancel").addEventListener("click", closeEditNomModal);
+  document.getElementById("nom-edit-save").addEventListener("click", saveEditNom);
+  nomEditModal.addEventListener("click", (e) => {
+    if (e.target === nomEditModal) closeEditNomModal();
+  });
 
   /* ---------- Отчёт о производстве ---------- */
 
