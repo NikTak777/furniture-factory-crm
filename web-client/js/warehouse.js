@@ -86,6 +86,27 @@
     }
   }
 
+  function fillMatUnitSelect(selectedUnit) {
+    const matUnit = document.getElementById("mat-unit");
+    const unitValues = [...stUnit.options]
+      .map((o) => o.value)
+      .filter((v) => v);
+
+    matUnit.innerHTML = "";
+    unitValues.forEach((u) => {
+      const opt = document.createElement("option");
+      opt.value = u;
+      opt.textContent = u;
+      matUnit.appendChild(opt);
+    });
+
+    if (selectedUnit && unitValues.includes(selectedUnit)) {
+      matUnit.value = selectedUnit;
+    } else if (unitValues.length > 0) {
+      matUnit.value = unitValues[0];
+    }
+  }
+
   function stockFiltered() {
     const q = stSearch.value.trim().toLowerCase();
     const unit = stUnit.value;
@@ -173,7 +194,7 @@
     document.getElementById("mat-name").value = existing
       ? existing.materialName || ""
       : "";
-    document.getElementById("mat-unit").value = existing ? existing.unit || "" : "";
+    fillMatUnitSelect(existing ? existing.unit || "" : "");
     document.getElementById("mat-qty").value = existing
       ? String(existing.quantityAvailable ?? 0)
       : "0";
