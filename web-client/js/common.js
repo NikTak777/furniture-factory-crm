@@ -1,10 +1,9 @@
 (function () {
   const STORAGE_KEY = "furniture_crm_user";
 
-  window.CRM_API_BASE =
-    window.CRM_API_BASE || "http://localhost:5028/api";
+  window.CRM_API_BASE = window.CRM_API_BASE || "http://localhost:5028/api";
 
-  /** Первое непустое значение по списку ключей (учёт camelCase ASP.NET для кириллицы). */
+  // Первое непустое значение по списку ключей (учёт camelCase ASP.NET для кириллицы)
   function pickFirst(payload, keys) {
     for (let i = 0; i < keys.length; i++) {
       const k = keys[i];
@@ -18,7 +17,6 @@
 
   window.parseAuthUser = function (payload) {
     if (!payload || typeof payload !== "object") return null;
-    // Сервер: JsonSerializer + CamelCase → ID_сотрудника становится "iD_сотрудника", ФИО → "фИО", Должность → "должность"
     const staffId = pickFirst(payload, [
       "staffId",
       "ID_сотрудника",
@@ -77,7 +75,9 @@
       return null;
     }
     if (!isManagerRole(user.position)) {
-      alert("Вход доступен только менеджеру. Попробуйте войти с другой учётной записью.");
+      alert(
+        "Вход доступен только менеджеру. Попробуйте войти с другой учётной записью."
+      );
       window.location.href = "index.html";
       return null;
     }

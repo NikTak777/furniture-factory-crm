@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Панель менеджера — FurniFlow</title>
+    <title>Панель менеджера — FurnitureCRM</title>
     <link rel="stylesheet" href="css/app.css" />
   </head>
   <body>
@@ -31,6 +31,7 @@
         </button>
       </nav>
 
+      <!-- Вкладка "Номенклатура" -->
       <section class="panel active" id="panel-nom" role="tabpanel">
         <div class="toolbar">
           <div class="field">
@@ -68,6 +69,7 @@
         </div>
       </section>
 
+      <!-- Вкладка "Заказы" -->
       <section class="panel" id="panel-orders" role="tabpanel">
         <div class="toolbar">
           <div class="field">
@@ -84,6 +86,9 @@
           </div>
           <button type="button" class="btn btn-secondary" id="ord-clear">Сбросить</button>
           <button type="button" class="btn btn-secondary" id="ord-refresh">Обновить</button>
+          <button type="button" class="btn btn-primary" id="ord-add" style="width: auto">
+            Новый заказ
+          </button>
         </div>
         <div class="table-wrap">
           <table class="data">
@@ -98,6 +103,7 @@
                 <th>Сотрудник</th>
                 <th>Сумма</th>
                 <th>Выполнен</th>
+                <th style="min-width: 120px">Действия</th>
               </tr>
             </thead>
             <tbody id="ord-body"></tbody>
@@ -105,6 +111,7 @@
         </div>
       </section>
 
+      <!-- Вкладка "Клиенты" -->
       <section class="panel" id="panel-clients" role="tabpanel">
         <div class="toolbar">
           <div class="field" style="flex: 2 1 220px">
@@ -125,6 +132,7 @@
                 <th>Email</th>
                 <th>Адрес</th>
                 <th>Регистрация</th>
+                <th style="min-width: 110px">Действия</th>
               </tr>
             </thead>
             <tbody id="cl-body"></tbody>
@@ -132,6 +140,7 @@
         </div>
       </section>
 
+      <!-- Вкладка "Отчёты о производстве" -->
       <section class="panel" id="panel-reports" role="tabpanel">
         <div class="toolbar">
           <div class="field">
@@ -174,9 +183,12 @@
       </section>
     </div>
 
+    <!-- Модальное окно: новый клиент -->
     <div class="modal-backdrop" id="cl-modal" aria-hidden="true">
       <div class="modal" role="dialog" aria-modal="true" aria-labelledby="cl-modal-title">
         <h2 id="cl-modal-title">Новый клиент</h2>
+        <input type="hidden" id="cl-edit-id" value="" />
+        <input type="hidden" id="cl-edit-registration" value="" />
         <div class="field">
           <label class="label" for="cl-fn">ФИО</label>
           <input id="cl-fn" type="text" />
@@ -203,10 +215,48 @@
       </div>
     </div>
 
+    <!-- Модальное окно: новый заказ -->
+    <div class="modal-backdrop" id="ord-modal" aria-hidden="true">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="ord-modal-title">
+        <h2 id="ord-modal-title">Заказ</h2>
+        <input type="hidden" id="ord-form-order-id" value="" />
+
+        <div class="field">
+          <label class="label" for="ord-form-product-input">Номенклатура</label>
+          <div id="ord-form-product-combobox" class="combobox-host"></div>
+        </div>
+        <div class="field">
+          <label class="label" for="ord-form-qty">Количество</label>
+          <input id="ord-form-qty" type="number" min="1" step="1" value="1" />
+        </div>
+        <div class="field">
+          <label class="label" for="ord-form-client-input">Клиент</label>
+          <div id="ord-form-client-combobox" class="combobox-host"></div>
+        </div>
+        <div class="field">
+          <span class="label">Итоговая стоимость</span>
+          <div id="ord-form-total" style="font-weight: 700"></div>
+        </div>
+        <div class="field" id="ord-form-status-wrap" style="display: none">
+          <label class="label" for="ord-form-status">Статус заказа</label>
+          <select id="ord-form-status"></select>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" id="ord-form-cancel">Отмена</button>
+          <button type="button" class="btn btn-primary" id="ord-form-save" style="width: auto">
+            Сохранить
+          </button>
+        </div>
+        <div class="msg error" id="ord-form-msg"></div>
+      </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script src="js/chart-theme.js"></script>
     <script src="js/common.js"></script>
     <script src="js/production-charts.js"></script>
+    <script src="js/search-combobox.js"></script>
     <script src="js/manager.js"></script>
   </body>
 </html>

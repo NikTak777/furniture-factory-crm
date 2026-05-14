@@ -390,6 +390,65 @@ table.data tbody tr.row-selected td {
   border-radius: var(--radius);
   padding: 18px;
   box-shadow: var(--shadow);
+  overflow: visible;
+}
+
+.combobox {
+  position: relative;
+}
+
+.combobox-input {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: #0f172a;
+  color: var(--text);
+  font-size: 0.95rem;
+}
+
+.combobox-input:focus {
+  outline: 2px solid rgba(99, 102, 241, 0.45);
+  outline-offset: 1px;
+}
+
+.combobox-input-readonly {
+  opacity: 0.92;
+  cursor: default;
+}
+
+.combobox-list {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% + 4px);
+  margin: 0;
+  padding: 4px 0;
+  list-style: none;
+  max-height: 220px;
+  overflow-y: auto;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  z-index: 60;
+}
+
+.combobox-option {
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 0.92rem;
+}
+
+.combobox-option:hover,
+.combobox-option.is-active {
+  background: rgba(99, 102, 241, 0.18);
+}
+
+.combobox-empty {
+  padding: 8px 12px;
+  color: var(--muted);
+  font-size: 0.88rem;
 }
 
 .modal h2 {

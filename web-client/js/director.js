@@ -49,7 +49,7 @@
     tb.appendChild(tr);
   }
 
-  /* ---------- Сотрудники ---------- */
+  // Вкладка "Учёт сотрудников"
 
   /** @type {any[]} */
   let staffList = [];
@@ -108,7 +108,7 @@
   function maskedPassword(s) {
     const pwd = s.userAccount?.password;
     if (!pwd) return "—";
-    return "••••••••";
+    return "•••••••• ";
   }
 
   function generateRandomPassword(length = 12) {
@@ -358,7 +358,7 @@
     if (e.target === stEditModal) closeEditModal();
   });
 
-  /* ---------- Номенклатура ---------- */
+  // Вкладка "Учёт номенклатуры"
 
   /** @type {any[]} */
   let nomenclature = [];
@@ -655,7 +655,7 @@
     if (e.target === nomEditModal) closeEditNomModal();
   });
 
-  /* ---------- Отчёт о производстве ---------- */
+  // Вкладка "Анализ отчётов о производстве"
 
   const prodStats = document.getElementById("prod-stats");
   const prodBody = document.getElementById("prod-body");
@@ -722,7 +722,7 @@
     }
   });
 
-  /* ---------- Анализ продаж персонала ---------- */
+  // Вкладка "Анализ продаж персонала"
 
   const saleMgrBody = document.getElementById("sale-mgr-body");
   const salePrBody = document.getElementById("sale-pr-body");

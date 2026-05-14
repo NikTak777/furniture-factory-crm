@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Панель директора — FurniFlow</title>
+    <title>Панель директора — FurnitureCRM</title>
     <link rel="stylesheet" href="css/app.css" />
   </head>
   <body>
@@ -31,7 +31,7 @@
         </button>
       </nav>
 
-      <!-- Сотрудники -->
+      <!-- Вкладка "Учёт сотрудников" -->
       <section class="panel active" id="panel-staff" role="tabpanel">
         <div class="toolbar">
           <div class="field">
@@ -71,7 +71,7 @@
         </div>
       </section>
 
-      <!-- Номенклатура -->
+      <!-- Вкладка "Учёт номенклатуры" -->
       <section class="panel" id="panel-nom" role="tabpanel">
         <div class="toolbar">
           <div class="field">
@@ -123,7 +123,7 @@
         </div>
       </section>
 
-      <!-- Отчёт о производстве -->
+      <!-- Вкладка "Анализ отчётов о производстве" -->
       <section class="panel" id="panel-prod" role="tabpanel">
         <div class="toolbar">
           <div class="field">
@@ -165,7 +165,7 @@
         <div class="msg" id="prod-msg"></div>
       </section>
 
-      <!-- Анализ продаж персонала -->
+      <!-- Вкладка "Анализ продаж персонала" -->
       <section class="panel" id="panel-sales" role="tabpanel">
         <div class="toolbar">
           <div class="field">
@@ -220,6 +220,7 @@
       </section>
     </div>
 
+    <!-- Модальное окно: добавить сотрудника -->
     <div class="modal-backdrop" id="st-modal-add" aria-hidden="true">
       <div class="modal" role="dialog" aria-modal="true" aria-labelledby="st-modal-add-title">
         <h2 id="st-modal-add-title">Добавить сотрудника</h2>
@@ -246,6 +247,7 @@
       </div>
     </div>
 
+    <!-- Модальное окно: редактировать сотрудника -->
     <div class="modal-backdrop" id="st-modal-edit" aria-hidden="true">
       <div class="modal" role="dialog" aria-modal="true" aria-labelledby="st-modal-edit-title">
         <h2 id="st-modal-edit-title">Редактировать сотрудника</h2>
@@ -291,6 +293,7 @@
       </div>
     </div>
 
+    <!-- Модальное окно: добавить номенклатуру -->
     <div class="modal-backdrop" id="nom-modal-add" aria-hidden="true">
       <div class="modal" role="dialog" aria-modal="true" aria-labelledby="nom-modal-add-title">
         <h2 id="nom-modal-add-title">Добавить номенклатуру</h2>
@@ -324,6 +327,7 @@
       </div>
     </div>
 
+    <!-- Модальное окно: редактировать номенклатуру -->
     <div class="modal-backdrop" id="nom-modal-edit" aria-hidden="true">
       <div class="modal" role="dialog" aria-modal="true" aria-labelledby="nom-modal-edit-title">
         <h2 id="nom-modal-edit-title">Редактировать номенклатуру</h2>

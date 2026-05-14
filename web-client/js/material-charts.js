@@ -1,6 +1,4 @@
-/**
- * Диаграммы анализа потребности в материалах
- */
+// Диаграммы анализа потребности в материалах
 (function (global) {
   const PALETTE = [
     "rgb(91, 155, 213)",
@@ -29,9 +27,7 @@
     }
   }
 
-  /**
-   * Потребность: доли requiredQuantity, слив <3% в «Другое»
-   */
+  // Потребность: доли requiredQuantity, слив <3% в «Другое»
   global.renderMaterialNeedsPie = function (canvas, needsItems) {
     if (needsChart) {
       needsChart.destroy();
@@ -126,9 +122,7 @@
     });
   };
 
-  /**
-   * Топ‑9 материалов по потреблению за 3 мес., остальное — «Другое»
-   */
+  // Топ‑9 материалов по потреблению за 3 мес., остальное — «Другое»
   global.renderMaterialUsagePie = function (canvas, usageItems) {
     if (usageChart) {
       usageChart.destroy();

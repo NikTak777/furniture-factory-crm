@@ -55,7 +55,7 @@
     });
   }
 
-  /* ---------- Склад ---------- */
+  // Вкладка "Учёт сырья на складе"
 
   const stBody = document.getElementById("st-body");
   const stSearch = document.getElementById("st-search");
@@ -271,7 +271,7 @@
     }
   }
 
-  /* ---------- Заказы сырья ---------- */
+  // Вкладка "Оформление закупки сырья"
 
   const moBody = document.getElementById("mo-body");
   const moSup = document.getElementById("mo-sup");
@@ -553,7 +553,7 @@
     }
   });
 
-  /* ---------- Потребность ---------- */
+  // Вкладка "Анализ потребности в материалах"
 
   const ndBody = document.getElementById("nd-body");
   const ndUsageBody = document.getElementById("nd-usage-body");

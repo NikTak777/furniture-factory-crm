@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Панель кладовщика — FurniFlow</title>
+    <title>Панель кладовщика — FurnitureCRM</title>
     <link rel="stylesheet" href="css/app.css" />
   </head>
   <body>
@@ -22,7 +22,7 @@
         <button type="button" class="tab" data-panel="needs">Анализ потребности в материалах</button>
       </nav>
 
-      <!-- Склад -->
+      <!-- Вкладка "Учёт сырья на складе" -->
       <section class="panel active" id="panel-stock" role="tabpanel">
         <div class="toolbar">
           <div class="field">
@@ -61,7 +61,7 @@
         </div>
       </section>
 
-      <!-- Заказы сырья -->
+      <!-- Вкладка "Оформление закупки сырья" -->
       <section class="panel" id="panel-orders" role="tabpanel">
         <div class="toolbar">
           <div class="field">
@@ -111,7 +111,7 @@
         </div>
       </section>
 
-      <!-- Потребность -->
+      <!-- Вкладка "Анализ потребности в материалах" -->
       <section class="panel" id="panel-needs" role="tabpanel">
         <div class="toolbar">
           <div class="field">
@@ -169,7 +169,7 @@
       </section>
     </div>
 
-    <!-- Модальное окно: сырьё -->
+    <!-- Модальное окно: добавить сырьё -->
     <div class="modal-backdrop" id="mat-modal" aria-hidden="true">
       <div class="modal" role="dialog" aria-labelledby="mat-modal-title">
         <h2 id="mat-modal-title">Сырьё</h2>
@@ -194,7 +194,7 @@
       </div>
     </div>
 
-    <!-- Новый заказ сырья -->
+    <!-- Модальное окно: новый заказ сырья -->
     <div class="modal-backdrop" id="mo-modal-new" aria-hidden="true">
       <div class="modal" role="dialog" aria-labelledby="mo-new-title">
         <h2 id="mo-new-title">Новый заказ сырья</h2>
@@ -218,7 +218,7 @@
       </div>
     </div>
 
-    <!-- Редактирование заказа -->
+    <!-- Модальное окно: редактировать заказ -->
     <div class="modal-backdrop" id="mo-modal-edit" aria-hidden="true">
       <div class="modal" role="dialog">
         <h2>Изменить заказ</h2>
